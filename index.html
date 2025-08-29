@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Calm Space</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MC36YP42XZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MC36YP42XZ');
+  </script>
+</head>
+
+<body>
+  <!-- Chọn ngôn ngữ -->
+  <div class="language-select-overlay" id="language-select">
+    <div class="language-select-box">
+      <h2>Choose your language / Chọn ngôn ngữ</h2>
+      <button data-lang="vi">Tiếng Việt 🇻🇳</button>
+      <button data-lang="en">English 🇺🇸</button>
+    </div>
+  </div>
+
+    <!-- Hộp chat -->
+    <div class="chat-container" id="chat-container">
+    <div class="chat-fixed-header">
+        <div class="chat-header">
+        <h3>Bạn không cô đơn – Mình ở đây để lắng nghe bạn ❤️</h3>
+        </div>
+        <div class="chat-support-note">
+        Nếu bạn cảm thấy căng thẳng, hãy gọi <strong>1800 1567</strong> để nhận được sự hỗ trợ từ chuyên gia.
+        </div>
+    </div>
+
+    <!-- Khung chat -->
+    <div class="chat-body">
+    </div>
+
+    <div class="chat-input">
+        <textarea class="message-input" placeholder="Nhập tin nhắn của bạn..."></textarea>
+        <button id="send-message" class="material-symbols-rounded">send</button>
+    </div>
+    </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
