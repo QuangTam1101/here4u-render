@@ -1,336 +1,249 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-    <title>Calm Space - Không gian hỗ trợ tâm lý</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MC36YP42XZ"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-MC36YP42XZ');
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calm Space - Không gian tâm lý lành mạnh</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/mood-diary.css">
+    <link rel="stylesheet" href="css/calmi-chat.css">
+    <link rel="stylesheet" href="css/explore.css">
+    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="css/settings.css">
+    
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Chọn ngôn ngữ -->
-    <div class="language-select-overlay" id="language-select">
-        <div class="language-select-box">
-            <div class="logo-welcome">
-                <span class="rainbow-text">✨ Calm Space ✨</span>
-            </div>
-            <h2>Choose your language / Chọn ngôn ngữ</h2>
-            <button data-lang="vi">Tiếng Việt 🇻🇳</button>
-            <button data-lang="en">English 🇺🇸</button>
-        </div>
-    </div>
-
-    <!-- Navigation Header -->
+    <!-- Header -->
     <header class="main-header">
-        <div class="header-content">
-            <div class="logo">
-                <span class="rainbow-text">Calm Space</span>
+        <div class="logo-section">
+            <img src="images/avatar.jpg" alt="Calm Space Logo" class="logo">
+            <h1 class="site-title">Calm Space</h1>
+        </div>
+        
+        <div class="header-right">
+            <button class="settings-btn" onclick="openSettings()">
+                <i class="fas fa-cog"></i>
+            </button>
+            
+            <div class="auth-buttons" id="authButtons">
+                <button class="btn-login" onclick="showLoginModal()">Đăng nhập</button>
+                <button class="btn-register" onclick="showLoginModal()">Đăng ký</button>
             </div>
-            <nav class="nav-menu">
-                <button class="nav-item active" data-section="home">
-                    <span class="material-symbols-rounded">home</span>
-                    <span class="nav-text">Trang chủ</span>
-                </button>
-                <button class="nav-item" data-section="mood">
-                    <span class="material-symbols-rounded">mood</span>
-                    <span class="nav-text">Tâm trạng</span>
-                </button>
-                <button class="nav-item" data-section="chat">
-                    <span class="material-symbols-rounded">chat</span>
-                    <span class="nav-text">Trò chuyện</span>
-                </button>
-                <button class="nav-item" data-section="recommendations">
-                    <span class="material-symbols-rounded">explore</span>
-                    <span class="nav-text">Khám phá</span>
-                </button>
-                <button class="nav-item" data-section="profile">
-                    <span class="material-symbols-rounded">person</span>
-                    <span class="nav-text">Hồ sơ</span>
-                </button>
-            </nav>
+            
+            <div class="user-info" id="userInfo" style="display: none;">
+                <img id="userAvatar" src="" alt="User Avatar" class="user-avatar">
+                <span id="userName"></span>
+            </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="main-container">
-        
-        <!-- Home Section -->
-        <section class="section active" id="home-section">
-            <div class="welcome-card">
-                <h1 class="gradient-text">Chào mừng đến với Calm Space</h1>
-                <p class="subtitle">Không gian an toàn cho sức khỏe tinh thần của bạn</p>
+    <!-- Home Section (Before Login) -->
+    <section id="homeSection" class="home-section active">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h2 class="hero-title">Chào mừng đến với Calm Space</h2>
+                <p class="hero-subtitle">Không gian an toàn cho sức khỏe tâm lý của bạn</p>
                 
-                <div class="feature-grid">
-                    <div class="feature-card pastel-pink">
-                        <span class="material-symbols-rounded">self_improvement</span>
-                        <h3>Thiền & Thở</h3>
-                        <p>Bài tập thở và thiền giúp thư giãn</p>
-                    </div>
-                    <div class="feature-card pastel-blue">
-                        <span class="material-symbols-rounded">library_music</span>
-                        <h3>Âm nhạc thư giãn</h3>
-                        <p>Playlist được tuyển chọn để giảm stress</p>
-                    </div>
-                    <div class="feature-card pastel-green">
-                        <span class="material-symbols-rounded">auto_stories</span>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-book-open"></i>
                         <h3>Nhật ký tâm trạng</h3>
-                        <p>Theo dõi cảm xúc hàng ngày</p>
-                    </div>
-                    <div class="feature-card pastel-purple">
-                        <span class="material-symbols-rounded">support_agent</span>
-                        <h3>AI Đồng hành</h3>
-                        <p>Trò chuyện với AI thông minh</p>
-                    </div>
-                </div>
-
-                <div class="quick-actions">
-                    <button class="action-btn breathing-btn">
-                        <span class="material-symbols-rounded">air</span>
-                        Bắt đầu thở sâu
-                    </button>
-                    <button class="action-btn meditation-btn">
-                        <span class="material-symbols-rounded">spa</span>
-                        Thiền 5 phút
-                    </button>
-                </div>
-            </div>
-
-            <!-- Breathing Exercise -->
-            <div class="breathing-exercise hidden">
-                <div class="breathing-circle">
-                    <div class="inner-circle"></div>
-                    <span class="breathing-text">Hít vào...</span>
-                </div>
-                <button class="close-breathing">
-                    <span class="material-symbols-rounded">close</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Mood Tracker Section -->
-        <section class="section" id="mood-section">
-            <div class="mood-container">
-                <h2 class="section-title gradient-text">Nhật ký tâm trạng</h2>
-                
-                <!-- Today's Mood -->
-                <div class="today-mood-card">
-                    <h3>Hôm nay bạn cảm thấy thế nào?</h3>
-                    <div class="mood-selector">
-                        <button class="mood-btn" data-mood="very-happy">
-                            <span class="mood-emoji">😊</span>
-                            <span>Rất vui</span>
-                        </button>
-                        <button class="mood-btn" data-mood="happy">
-                            <span class="mood-emoji">🙂</span>
-                            <span>Vui</span>
-                        </button>
-                        <button class="mood-btn" data-mood="neutral">
-                            <span class="mood-emoji">😐</span>
-                            <span>Bình thường</span>
-                        </button>
-                        <button class="mood-btn" data-mood="sad">
-                            <span class="mood-emoji">😔</span>
-                            <span>Buồn</span>
-                        </button>
-                        <button class="mood-btn" data-mood="very-sad">
-                            <span class="mood-emoji">😢</span>
-                            <span>Rất buồn</span>
-                        </button>
+                        <p>Theo dõi và phân tích cảm xúc hàng ngày của bạn</p>
                     </div>
                     
-                    <div class="mood-note">
-                        <textarea placeholder="Chia sẻ thêm về cảm xúc của bạn..." class="mood-textarea"></textarea>
-                        <button class="save-mood-btn">
-                            <span class="material-symbols-rounded">save</span>
-                            Lưu tâm trạng
-                        </button>
+                    <div class="feature-card">
+                        <i class="fas fa-robot"></i>
+                        <h3>Calmi AI</h3>
+                        <p>Người bạn AI luôn sẵn sàng lắng nghe và hỗ trợ</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <i class="fas fa-compass"></i>
+                        <h3>Khám phá</h3>
+                        <p>Bài viết, bài tập và âm nhạc thư giãn</p>
                     </div>
                 </div>
+                
+                <button class="cta-button" onclick="showLoginModal()">
+                    Bắt đầu hành trình
+                </button>
+            </div>
+        </div>
+    </section>
 
-                <!-- Mood Calendar -->
-                <div class="mood-calendar">
-                    <h3>Lịch sử tâm trạng 30 ngày</h3>
-                    <div class="calendar-grid" id="mood-calendar-grid">
-                        <!-- Calendar will be generated by JS -->
-                    </div>
+    <!-- Main App (After Login) -->
+    <div id="mainApp" style="display: none;">
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <ul class="nav-list">
+                <li class="nav-item" data-section="moodDiary">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Nhật ký tâm trạng</span>
+                </li>
+                <li class="nav-item" data-section="calmiChat">
+                    <i class="fas fa-comments"></i>
+                    <span>Calmi AI</span>
+                </li>
+                <li class="nav-item" data-section="explore">
+                    <i class="fas fa-compass"></i>
+                    <span>Khám phá</span>
+                </li>
+                <li class="nav-item" data-section="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Hồ sơ</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Mood Diary Section -->
+        <section id="moodDiary" class="app-section">
+            <div class="section-header">
+                <h2>Nhật ký tâm trạng</h2>
+            </div>
+            
+            <div class="mood-container">
+                <div class="calendar-section">
+                    <div id="calendar" class="calendar"></div>
                 </div>
-
-                <!-- Mood Analytics -->
+                
+                <div class="mood-input-section">
+                    <h3>Hôm nay bạn cảm thấy thế nào?</h3>
+                    <div class="mood-emojis">
+                        <button class="mood-btn" data-mood="1">😢</button>
+                        <button class="mood-btn" data-mood="2">😔</button>
+                        <button class="mood-btn" data-mood="3">😐</button>
+                        <button class="mood-btn" data-mood="4">🙂</button>
+                        <button class="mood-btn" data-mood="5">😄</button>
+                    </div>
+                    
+                    <textarea id="moodNote" placeholder="Chia sẻ thêm về ngày hôm nay... (tùy chọn)" class="mood-note"></textarea>
+                    
+                    <div class="mood-tags">
+                        <h4>Chọn chủ đề liên quan:</h4>
+                        <div class="tags-container">
+                            <button class="tag-btn" data-tag="family">👨‍👩‍👧‍👦 Gia đình</button>
+                            <button class="tag-btn" data-tag="friends">👥 Bạn bè</button>
+                            <button class="tag-btn" data-tag="work">💼 Công việc</button>
+                            <button class="tag-btn" data-tag="study">📚 Học tập</button>
+                            <button class="tag-btn" data-tag="health">💪 Sức khỏe</button>
+                            <button class="tag-btn" data-tag="love">❤️ Tình yêu</button>
+                        </div>
+                    </div>
+                    
+                    <button class="save-mood-btn" onclick="saveMood()">Lưu tâm trạng</button>
+                </div>
+                
                 <div class="mood-analytics">
-                    <h3>Phân tích xu hướng cảm xúc</h3>
-                    <div class="analytics-cards">
-                        <div class="analytic-card">
-                            <span class="material-symbols-rounded">trending_up</span>
-                            <div class="analytic-info">
-                                <span class="analytic-label">Tâm trạng chủ đạo</span>
-                                <span class="analytic-value">Tích cực 😊</span>
-                            </div>
-                        </div>
-                        <div class="analytic-card">
-                            <span class="material-symbols-rounded">event</span>
-                            <div class="analytic-info">
-                                <span class="analytic-label">Ngày vui nhất</span>
-                                <span class="analytic-value">Thứ 6</span>
-                            </div>
-                        </div>
-                        <div class="analytic-card">
-                            <span class="material-symbols-rounded">insights</span>
-                            <div class="analytic-info">
-                                <span class="analytic-label">Xu hướng</span>
-                                <span class="analytic-value">Cải thiện</span>
-                            </div>
-                        </div>
-                    </div>
+                    <h3>Phân tích tâm trạng tuần qua</h3>
+                    <canvas id="moodChart"></canvas>
+                    <div id="topFactors" class="top-factors"></div>
                 </div>
             </div>
         </section>
 
-        <!-- Chat Section -->
-        <section class="section" id="chat-section">
-            <div class="chat-container" id="chat-container">
-                <div class="chat-fixed-header">
-                    <div class="chat-header">
-                        <h3>Calmi - AI Đồng hành của bạn</h3>
-                        <span class="online-indicator">● Online</span>
-                    </div>
-                    <div class="chat-support-note">
-                        Nếu cần hỗ trợ khẩn cấp, hãy gọi <strong>1800 1567</strong>
+        <!-- Calmi Chat Section -->
+        <section id="calmiChat" class="app-section" style="display: none;">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="calmi-avatar">🤖</div>
+                    <div class="calmi-info">
+                        <h3>Calmi</h3>
+                        <span class="status">Sẵn sàng lắng nghe bạn</span>
                     </div>
                 </div>
                 
-                <div class="chat-body"></div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message calmi-message">
+                        <p>Xin chào! Mình là Calmi, người bạn AI của bạn. Bạn có thể chia sẻ với mình bất cứ điều gì. Mình ở đây để lắng nghe và hỗ trợ bạn. 💙</p>
+                    </div>
+                </div>
                 
-                <div class="chat-input">
-                    <textarea class="message-input" placeholder="Nhắn tâm sự của bạn..."></textarea>
-                    <button id="send-message" class="material-symbols-rounded">send</button>
+                <div class="chat-input-container">
+                    <textarea id="chatInput" placeholder="Nhập tin nhắn..." class="chat-input"></textarea>
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- Recommendations Section -->
-        <section class="section" id="recommendations-section">
-            <div class="recommendations-container">
-                <h2 class="section-title gradient-text">Khám phá cho bạn</h2>
+        <!-- Explore Section -->
+        <section id="explore" class="app-section" style="display: none;">
+            <div class="explore-container">
+                <h2>Khám phá</h2>
                 
-                <!-- Recommendation Tabs -->
-                <div class="rec-tabs">
-                    <button class="rec-tab active" data-tab="articles">Bài viết</button>
-                    <button class="rec-tab" data-tab="exercises">Bài tập</button>
-                    <button class="rec-tab" data-tab="music">Âm nhạc</button>
-                    <button class="rec-tab" data-tab="habits">Thói quen</button>
+                <div class="explore-tabs">
+                    <button class="tab-btn active" data-tab="articles">📚 Bài viết</button>
+                    <button class="tab-btn" data-tab="exercises">🧘 Bài tập</button>
+                    <button class="tab-btn" data-tab="music">🎵 Âm nhạc</button>
                 </div>
-
-                <!-- Articles Tab -->
-                <div class="rec-content active" id="articles-content">
-                    <div class="article-grid">
+                
+                <div class="tab-content" id="articlesTab">
+                    <div class="articles-grid">
                         <article class="article-card">
-                            <div class="article-tag">Giảm stress</div>
-                            <h3>5 cách đơn giản để giảm căng thẳng học tập</h3>
-                            <p>Khám phá những phương pháp hiệu quả giúp bạn vượt qua áp lực...</p>
-                            <button class="read-more">Đọc thêm →</button>
+                            <img src="https://picsum.photos/300/200?random=1" alt="Article">
+                            <h3>5 cách giảm stress hiệu quả</h3>
+                            <p>Khám phá các phương pháp đơn giản giúp bạn giảm căng thẳng trong cuộc sống hàng ngày.</p>
+                            <a href="#" class="read-more">Đọc thêm →</a>
                         </article>
+                        
                         <article class="article-card">
-                            <div class="article-tag">Tâm lý</div>
-                            <h3>Hiểu về lo âu và cách đối phó</h3>
-                            <p>Lo âu là cảm xúc bình thường, nhưng khi nào cần được quan tâm...</p>
-                            <button class="read-more">Đọc thêm →</button>
-                        </article>
-                        <article class="article-card">
-                            <div class="article-tag">Kỹ năng</div>
-                            <h3>Xây dựng sự tự tin từ bên trong</h3>
-                            <p>Tự tin không phải tự nhiên mà có, hãy học cách phát triển...</p>
-                            <button class="read-more">Đọc thêm →</button>
+                            <img src="https://picsum.photos/300/200?random=2" alt="Article">
+                            <h3>Mindfulness cho người mới bắt đầu</h3>
+                            <p>Hướng dẫn cơ bản về chánh niệm và cách áp dụng vào cuộc sống.</p>
+                            <a href="#" class="read-more">Đọc thêm →</a>
                         </article>
                     </div>
                 </div>
-
-                <!-- Exercises Tab -->
-                <div class="rec-content" id="exercises-content">
-                    <div class="exercise-grid">
+                
+                <div class="tab-content" id="exercisesTab" style="display: none;">
+                    <div class="exercises-list">
                         <div class="exercise-card">
-                            <span class="material-symbols-rounded">air</span>
-                            <h3>Thở 4-7-8</h3>
-                            <p>Kỹ thuật thở giúp thư giãn nhanh chóng</p>
-                            <button class="start-exercise">Bắt đầu</button>
+                            <i class="fas fa-lungs"></i>
+                            <h3>Bài tập thở 4-7-8</h3>
+                            <p>Kỹ thuật thở giúp thư giãn và giảm lo âu</p>
+                            <button class="start-btn">Bắt đầu</button>
                         </div>
+                        
                         <div class="exercise-card">
-                            <span class="material-symbols-rounded">self_improvement</span>
-                            <h3>Body Scan</h3>
-                            <p>Quét cơ thể để nhận biết và giải phóng căng thẳng</p>
-                            <button class="start-exercise">Bắt đầu</button>
-                        </div>
-                        <div class="exercise-card">
-                            <span class="material-symbols-rounded">psychology</span>
-                            <h3>Mindfulness 5 phút</h3>
-                            <p>Thiền chánh niệm cho người mới bắt đầu</p>
-                            <button class="start-exercise">Bắt đầu</button>
+                            <i class="fas fa-brain"></i>
+                            <h3>Thiền 5 phút</h3>
+                            <p>Thiền ngắn giúp tập trung và bình tĩnh</p>
+                            <button class="start-btn">Bắt đầu</button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Music Tab -->
-                <div class="rec-content" id="music-content">
-                    <div class="music-playlists">
-                        <div class="playlist-card">
-                            <div class="playlist-cover pastel-gradient-1"></div>
-                            <h3>Thư giãn sâu</h3>
-                            <p>45 phút • Nhạc thiền & tự nhiên</p>
-                            <button class="play-btn">
-                                <span class="material-symbols-rounded">play_arrow</span>
-                            </button>
-                        </div>
-                        <div class="playlist-card">
-                            <div class="playlist-cover pastel-gradient-2"></div>
-                            <h3>Tập trung học tập</h3>
-                            <p>60 phút • Lo-fi & Instrumental</p>
-                            <button class="play-btn">
-                                <span class="material-symbols-rounded">play_arrow</span>
-                            </button>
-                        </div>
-                        <div class="playlist-card">
-                            <div class="playlist-cover pastel-gradient-3"></div>
-                            <h3>Ngủ ngon</h3>
-                            <p>30 phút • Âm thanh dịu nhẹ</p>
-                            <button class="play-btn">
-                                <span class="material-symbols-rounded">play_arrow</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Habits Tab -->
-                <div class="rec-content" id="habits-content">
-                    <div class="habits-list">
-                        <div class="habit-card">
-                            <div class="habit-icon">☀️</div>
-                            <div class="habit-info">
-                                <h3>Bắt đầu ngày với lòng biết ơn</h3>
-                                <p>Viết 3 điều bạn biết ơn mỗi sáng</p>
+                
+                <div class="tab-content" id="musicTab" style="display: none;">
+                    <div class="music-list">
+                        <div class="music-item">
+                            <i class="fas fa-play-circle"></i>
+                            <div class="music-info">
+                                <h4>Tiếng mưa nhẹ</h4>
+                                <span>30 phút</span>
                             </div>
-                            <button class="add-habit">+ Thêm</button>
                         </div>
-                        <div class="habit-card">
-                            <div class="habit-icon">🚶</div>
-                            <div class="habit-info">
-                                <h3>Đi bộ 15 phút</h3>
-                                <p>Vận động nhẹ nhàng mỗi ngày</p>
+                        
+                        <div class="music-item">
+                            <i class="fas fa-play-circle"></i>
+                            <div class="music-info">
+                                <h4>Sóng biển êm dịu</h4>
+                                <span>45 phút</span>
                             </div>
-                            <button class="add-habit">+ Thêm</button>
-                        </div>
-                        <div class="habit-card">
-                            <div class="habit-icon">📵</div>
-                            <div class="habit-info">
-                                <h3>Digital Detox</h3>
-                                <p>1 giờ không dùng điện thoại trước khi ngủ</p>
-                            </div>
-                            <button class="add-habit">+ Thêm</button>
                         </div>
                     </div>
                 </div>
@@ -338,61 +251,113 @@
         </section>
 
         <!-- Profile Section -->
-        <section class="section" id="profile-section">
+        <section id="profile" class="app-section" style="display: none;">
             <div class="profile-container">
-                <h2 class="section-title gradient-text">Hồ sơ của bạn</h2>
-                
-                <div class="profile-card">
-                    <div class="avatar-section">
-                        <div class="avatar">👤</div>
-                        <button class="change-avatar">Đổi avatar</button>
+                <div class="profile-header">
+                    <div class="profile-avatar-container">
+                        <img id="profileAvatar" src="" alt="Avatar" class="profile-avatar">
+                        <button class="change-avatar-btn">
+                            <i class="fas fa-camera"></i>
+                        </button>
                     </div>
                     
-                    <div class="profile-info">
-                        <input type="text" class="profile-name" placeholder="Tên của bạn">
-                        <textarea class="profile-bio" placeholder="Giới thiệu về bản thân..."></textarea>
-                    </div>
+                    <h2 id="profileName"></h2>
+                    <p class="usage-days">
+                        <i class="fas fa-calendar-check"></i>
+                        Đã sử dụng: <span id="usageDays">0</span> ngày
+                    </p>
                 </div>
-
-                <div class="stats-grid">
+                
+                <div class="profile-stats">
                     <div class="stat-card">
-                        <span class="stat-icon">📅</span>
-                        <span class="stat-value">7</span>
-                        <span class="stat-label">Ngày liên tiếp</span>
+                        <i class="fas fa-smile"></i>
+                        <h3>Tâm trạng trung bình</h3>
+                        <p id="avgMood">--</p>
                     </div>
+                    
                     <div class="stat-card">
-                        <span class="stat-icon">😊</span>
-                        <span class="stat-value">85%</span>
-                        <span class="stat-label">Tâm trạng tích cực</span>
+                        <i class="fas fa-fire"></i>
+                        <h3>Chuỗi ghi chép</h3>
+                        <p id="streak">0 ngày</p>
                     </div>
+                    
                     <div class="stat-card">
-                        <span class="stat-icon">🎯</span>
-                        <span class="stat-value">12</span>
-                        <span class="stat-label">Mục tiêu đạt được</span>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h3>Cài đặt</h3>
-                    <div class="setting-item">
-                        <span>Nhắc nhở hàng ngày</span>
-                        <label class="switch">
-                            <input type="checkbox" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <span>Chế độ tối</span>
-                        <label class="switch">
-                            <input type="checkbox">
-                            <span class="slider"></span>
-                        </label>
+                        <i class="fas fa-trophy"></i>
+                        <h3>Thành tựu</h3>
+                        <p id="achievements">0</p>
                     </div>
                 </div>
             </div>
         </section>
-    </main>
+    </div>
 
-    <script src="script.js"></script>
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content settings-modal">
+            <span class="close" onclick="closeSettings()">&times;</span>
+            <h2>Cài đặt</h2>
+            
+            <div class="settings-group">
+                <label>
+                    <i class="fas fa-language"></i>
+                    Ngôn ngữ / Language
+                </label>
+                <select id="languageSelect" class="settings-select">
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            
+            <div class="settings-group">
+                <label>
+                    <i class="fas fa-bell"></i>
+                    Thông báo nhắc ghi tâm trạng
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="notificationToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-group" id="logoutGroup" style="display: none;">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Đăng xuất
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content login-modal">
+            <span class="close" onclick="closeLoginModal()">&times;</span>
+            <h2>Chào mừng bạn!</h2>
+            <p>Đăng nhập để bắt đầu hành trình chăm sóc sức khỏe tâm lý</p>
+            
+            <div id="g_id_onload"
+                 data-client_id="65270854139-q7i8o813jc1iijqorhitmtkqm8b06gcj.apps.googleusercontent.com"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/mood-diary.js"></script>
+    <script src="js/calmi-chat.js"></script>
+    <script src="js/explore.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/settings.js"></script>
 </body>
 </html>
