@@ -94,18 +94,14 @@ function hideTypingIndicator() {
 
 async function callCalmiAPI(message) {
     try {
-        // Show typing indicator
-        showTypingIndicator();
-        
         const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:8000';
 
-        // Call to Node.js server
-        const response = await fetch('${API_URL}/api/chat', {
+        const response = await fetch(`${API_URL}/api/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message: message })
+            body: JSON.stringify({ message })
         });
         
         if (!response.ok) {
@@ -114,37 +110,27 @@ async function callCalmiAPI(message) {
         
         const data = await response.json();
         
-        // Hide typing indicator
+        // Ẩn typing indicator
         hideTypingIndicator();
         
-        // Extract response text
+        // Lấy text trả lời
         let responseText = 'Xin lỗi, mình không thể xử lý yêu cầu này. Vui lòng thử lại.';
-        
-        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+        if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
             responseText = data.candidates[0].content.parts[0].text;
         } else if (data.error) {
             console.error('API Error:', data.error);
             responseText = 'Xin lỗi, có lỗi xảy ra. Hãy thử lại sau nhé! 😔';
         }
         
-        // Add Calmi's response to chat
+        // Thêm tin nhắn trả lời vào chat
         addMessageToChat(responseText, 'calmi');
         
     } catch (error) {
         console.error('Error calling Calmi API:', error);
         hideTypingIndicator();
         
-        // Fallback responses when API fails
-        const fallbackResponses = [
-            'Mình hiểu cảm giác của bạn. Bạn có muốn chia sẻ thêm không? 💙',
-            'Cảm ơn bạn đã tin tưởng chia sẻ với mình. Mình luôn ở đây lắng nghe bạn. 🤗',
-            'Điều đó nghe có vẻ khó khăn. Bạn đã thử những cách nào để cải thiện tình hình chưa?',
-            'Mình rất vui khi được trò chuyện với bạn. Hãy nhớ rằng bạn không đơn độc nhé! 💪',
-            'Thật tuyệt khi bạn nhận ra điều đó. Việc hiểu rõ cảm xúc của mình là bước đầu quan trọng. 🌟'
-        ];
-        
-        const randomResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-        addMessageToChat(randomResponse, 'calmi');
+        // Không còn fallback responses nữa
+        addMessageToChat('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau nhé! 💙', 'calmi');
     }
 }
 
@@ -183,3 +169,4 @@ function saveChatHistory() {
     }
     localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
 }
+
