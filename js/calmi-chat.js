@@ -97,8 +97,10 @@ async function callCalmiAPI(message) {
         // Show typing indicator
         showTypingIndicator();
         
+        const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:8000';
+
         // Call to Node.js server
-        const response = await fetch('http://localhost:8000/api/chat', {
+        const response = await fetch('${API_URL}/api/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
