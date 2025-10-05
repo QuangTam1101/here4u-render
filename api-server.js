@@ -5,14 +5,29 @@ const axios = require('axios');
 const path = require('path');
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static('.')); // Serve static files từ thư mục hiện tại
+// CORS configuration cho production
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Cho phép requests từ bất kỳ origin nào (có thể giới hạn sau)
+        callback(null, true);
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+};
 
-// API Key (trong production nên dùng environment variables)
-const GEMINI_API_KEY = 'AIzaSyBEMIMXIIuTe7UMSz81G9599YKKL25KOMg';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.static('.')); 
+
+// Lấy API key từ environment variable (bảo mật hơn)
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBEMIMXIIuTe7UMSz81G9599YKKL25KOMg';
+const MODEL_NAME = 'gemini-1.5-flash';
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent`;
+
+// Health check endpoint cho Render
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK', message: 'Server is running' });
+});
 
 // Route cho API chat
 app.post('/api/chat', async (req, res) => {
@@ -26,7 +41,6 @@ app.post('/api/chat', async (req, res) => {
         const systemPrompt = `Bạn là Calmi, một người bạn AI thân thiện và đồng cảm, chuyên về hỗ trợ sức khỏe tâm lý. 
         Hãy lắng nghe, đồng cảm và đưa ra lời khuyên hữu ích một cách nhẹ nhàng. 
         Luôn tích cực nhưng cũng thực tế. Sử dụng emoji phù hợp để tạo sự gần gũi.
-        Nếu người dùng có dấu hiệu nghiêm trọng về sức khỏe tâm lý, hãy khuyên họ tìm kiếm sự giúp đỡ chuyên nghiệp.
         Trả lời bằng tiếng Việt.`;
         
         console.log('Sending request to Gemini API...');
@@ -45,39 +59,43 @@ app.post('/api/chat', async (req, res) => {
                     topK: 40,
                     topP: 0.95,
                 }
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
             }
         );
         
-        console.log('Gemini API response received');
+        console.log('Response received successfully');
         res.json(response.data);
         
     } catch (error) {
         console.error('API Error:', error.response?.data || error.message);
-        res.status(500).json({ 
-            error: 'API request failed',
-            details: error.response?.data || error.message 
+        
+        // Fallback response
+        res.json({
+            candidates: [{
+                content: {
+                    parts: [{
+                        text: "Xin lỗi, mình đang gặp một chút trục trặc. Bạn có thể thử lại sau nhé! 💙"
+                    }]
+                }
+            }]
         });
     }
 });
 
-// Test route
 app.get('/api/test', (req, res) => {
-    res.json({ message: 'API server is running!' });
+    res.json({ 
+        message: 'API server is running!',
+        model: MODEL_NAME,
+        environment: process.env.NODE_ENV || 'development'
+    });
 });
 
-// Serve index.html cho root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Sử dụng PORT từ environment variable (Render tự động set)
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-    console.log(`✅ Server is running at http://localhost:${PORT}`);
-    console.log(`📝 Open http://localhost:${PORT} in your browser`);
-    console.log(`🔧 API endpoint: http://localhost:${PORT}/api/chat`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Server is running on port ${PORT}`);
+    console.log(`📋 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
