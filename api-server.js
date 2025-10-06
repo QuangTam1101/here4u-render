@@ -20,9 +20,8 @@ app.use(express.json());
 app.use(express.static('.')); 
 
 // Lấy API key từ environment variable (bảo mật hơn)
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBEMIMXIIuTe7UMSz81G9599YKKL25KOMg';
-const MODEL_NAME = 'gemini-1.5-flash';
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent`;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
 
 // Health check endpoint cho Render
 app.get('/health', (req, res) => {
