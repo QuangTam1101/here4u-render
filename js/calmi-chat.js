@@ -94,14 +94,14 @@ function hideTypingIndicator() {
 
 async function callCalmiAPI(message) {
     try {
-        const API_URL = window.APP_CONFIG ? window.APP_CONFIG.API_URL : 'http://localhost:8000';
-
-        const response = await fetch(`${API_URL}/api/chat`, {
+        showTypingIndicator();
+        
+        const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message })
+            body: JSON.stringify({ message: message })
         });
         
         if (!response.ok) {
@@ -109,27 +109,19 @@ async function callCalmiAPI(message) {
         }
         
         const data = await response.json();
-        
-        // Ẩn typing indicator
         hideTypingIndicator();
         
-        // Lấy text trả lời
-        let responseText = 'Xin lỗi, mình không thể xử lý yêu cầu này. Vui lòng thử lại.';
-        if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        let responseText = 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.';
+        
+        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
             responseText = data.candidates[0].content.parts[0].text;
-        } else if (data.error) {
-            console.error('API Error:', data.error);
-            responseText = 'Xin lỗi, có lỗi xảy ra. Hãy thử lại sau nhé! 😔';
         }
         
-        // Thêm tin nhắn trả lời vào chat
         addMessageToChat(responseText, 'calmi');
         
     } catch (error) {
         console.error('Error calling Calmi API:', error);
         hideTypingIndicator();
-        
-        // Không còn fallback responses nữa
         addMessageToChat('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau nhé! 💙', 'calmi');
     }
 }
@@ -169,4 +161,5 @@ function saveChatHistory() {
     }
     localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
 }
+
 
