@@ -1,4 +1,4 @@
-// server.js - FIXED VERSION BASED ON YOUR OLD CODE
+// server.js - PRODUCTION READY VERSION
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -9,17 +9,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files cho full-stack deployment
+// Serve static files
 app.use(express.static(path.join(__dirname)));
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// API Configuration - DÙNG gemini-2.0-flash NHƯ CODE CŨ
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+// API Configuration 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
-// Health check cho Render
+// Health check
 app.get('/health', (req, res) => {
     res.status(200).json({ 
         status: 'OK', 
@@ -33,11 +33,12 @@ app.get('/api/test', (req, res) => {
     res.json({ 
         message: 'API server is running!',
         model: 'gemini-2.0-flash-exp',
-        apiKeyConfigured: !!GEMINI_API_KEY
+        apiKeyConfigured: !!GEMINI_API_KEY,
+        environment: process.env.NODE_ENV || 'development'
     });
 });
 
-// Main chat endpoint - GIỐNG NHƯ CODE CŨ với path /chat
+// Chat endpoint cho script.js cũ
 app.post('/chat', async (req, res) => {
     try {
         const requestOptions = {
@@ -65,7 +66,7 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-// THÊM endpoint /api/chat cho calmi-chat.js
+// Chat endpoint cho calmi-chat.js
 app.post('/api/chat', async (req, res) => {
     try {
         const { message } = req.body;
@@ -95,8 +96,6 @@ app.post('/api/chat', async (req, res) => {
             })
         };
         
-        console.log(`[${new Date().toISOString()}] Chat request received`);
-        
         const response = await fetch(API_URL, requestOptions);
         const data = await response.json();
         
@@ -105,7 +104,6 @@ app.post('/api/chat', async (req, res) => {
             return res.status(response.status).json(data);
         }
         
-        console.log(`[${new Date().toISOString()}] Gemini API response received`);
         res.json(data);
         
     } catch (error) {
@@ -117,17 +115,15 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// Serve index.html cho tất cả routes khác (cho full-stack)
+// Serve index.html
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start server - Dùng PORT từ env hoặc 3000 như code cũ
+// Port từ environment
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Server is running on port ${PORT}`);
     console.log(`📋 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔑 API Key: ${GEMINI_API_KEY ? 'Configured' : 'Not configured'}`);
-    console.log(`🤖 Model: gemini-2.0-flash-exp`);
-    console.log(`🌐 Open: http://localhost:${PORT}`);
 });
