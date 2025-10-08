@@ -15,8 +15,8 @@ app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// API Configuration 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
+// API Configuration - LẤY TỪ ENVIRONMENT VARIABLE
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY; // KHÔNG có default value cho production
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
 // Health check
