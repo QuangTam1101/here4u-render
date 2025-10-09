@@ -132,7 +132,7 @@
 .save-mood-btn {
     width: 100%;
     padding: 1rem;
-    background: var(--rainbow-gradient);
+    background: var(--ocean-gradient); 
     color: white;
     border: none;
     border-radius: 25px;
@@ -144,7 +144,7 @@
 
 .save-mood-btn:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 8px 20px rgba(106, 90, 205, 0.4);
 }
 
 .mood-analytics {
@@ -180,4 +180,5 @@
     .mood-analytics {
         grid-column: span 1;
     }
+
 }
