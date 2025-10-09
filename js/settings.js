@@ -1,4 +1,4 @@
-// Settings Management
+// settings.js - FIXED VERSION với confirm dialog và translation emoji
 let userSettings = {
     language: 'vi',
     notifications: true,
@@ -39,23 +39,36 @@ function applySettings() {
 }
 
 function initializeSettingsHandlers() {
-    // Language change
+    // Language change với confirmation
     const languageSelect = document.getElementById('languageSelect');
     if (languageSelect) {
         languageSelect.addEventListener('change', function() {
-            userSettings.language = this.value;
-            saveSettings();
+            const newLang = this.value;
+            const oldLang = userSettings.language;
             
-            if (this.value === 'en') {
-                translateToEnglish();
+            // Confirm message based on selected language
+            const confirmMsg = newLang === 'en' 
+                ? 'Do you want to change the language to English?' 
+                : 'Bạn có muốn đổi ngôn ngữ sang Tiếng Việt không?';
+            
+            if (confirm(confirmMsg)) {
+                userSettings.language = newLang;
+                saveSettings();
+                
+                if (newLang === 'en') {
+                    translateToEnglish();
+                } else {
+                    translateToVietnamese();
+                }
+                
+                showNotification(
+                    newLang === 'en' ? 'Language changed to English' : 'Đã đổi ngôn ngữ sang Tiếng Việt',
+                    'success'
+                );
             } else {
-                translateToVietnamese();
+                // Revert selection if cancelled
+                this.value = oldLang;
             }
-            
-            showNotification(
-                this.value === 'en' ? 'Language changed to English' : 'Đã đổi ngôn ngữ sang Tiếng Việt',
-                'success'
-            );
         });
     }
     
@@ -66,12 +79,14 @@ function initializeSettingsHandlers() {
             userSettings.notifications = this.checked;
             saveSettings();
             
+            const msg = userSettings.language === 'en' 
+                ? (this.checked ? 'Notifications enabled' : 'Notifications disabled')
+                : (this.checked ? 'Đã bật thông báo nhắc nhở' : 'Đã tắt thông báo nhắc nhở');
+            
             if (this.checked) {
                 requestNotificationPermission();
-                showNotification('Đã bật thông báo nhắc nhở', 'success');
-            } else {
-                showNotification('Đã tắt thông báo nhắc nhở', 'success');
             }
+            showNotification(msg, 'success');
         });
     }
 }
@@ -88,6 +103,186 @@ function closeSettings() {
     document.getElementById('settingsModal').style.display = 'none';
 }
 
+// COMPREHENSIVE TRANSLATION DICTIONARY với emoji support
+const translations = {
+    en: {
+        // Header & Auth
+        'Calm Space': 'Calm Space',
+        'Đăng nhập': 'Login',
+        'Đăng ký': 'Register',
+        'Đăng xuất': 'Logout',
+        
+        // Welcome Screen
+        'Chào mừng đến với Calm Space': 'Welcome to Calm Space',
+        'Không gian an toàn cho sức khỏe tâm lý của bạn': 'A safe space for your mental health',
+        'Bắt đầu hành trình': 'Start your journey',
+        
+        // Navigation
+        'Nhật ký tâm trạng': 'Mood Diary',
+        'Calmi AI': 'Calmi AI',
+        'Khám phá': 'Explore',
+        'Hồ sơ': 'Profile',
+        
+        // Features
+        'Theo dõi và phân tích cảm xúc hàng ngày của bạn': 'Track and analyze your daily emotions',
+        'Người bạn AI luôn sẵn sàng lắng nghe và hỗ trợ': 'AI companion always ready to listen and support',
+        'Bài viết, bài tập và âm nhạc thư giãn': 'Articles, exercises and relaxing music',
+        
+        // Mood Diary
+        'Hôm nay bạn cảm thấy thế nào?': 'How are you feeling today?',
+        'Chia sẻ thêm về ngày hôm nay... (tùy chọn)': 'Share more about today... (optional)',
+        'Chọn chủ đề liên quan:': 'Select related topics:',
+        
+        // Tag buttons với emoji - FIXED
+        '👨‍👩‍👧‍👦 Gia đình': '👨‍👩‍👧‍👦 Family',
+        '👥 Bạn bè': '👥 Friends',
+        '💼 Công việc': '💼 Work',
+        '📚 Học tập': '📚 Study',
+        '💪 Sức khỏe': '💪 Health',
+        '❤️ Tình yêu': '❤️ Love',
+        
+        'Lưu tâm trạng': 'Save Mood',
+        'Phân tích tâm trạng tuần qua': 'Last week mood analysis',
+        
+        // Calmi Chat
+        'Sẵn sàng lắng nghe bạn': 'Ready to listen to you',
+        'Xin chào! Mình là Calmi, người bạn AI của bạn. Bạn có thể chia sẻ với mình bất cứ điều gì. Mình ở đây để lắng nghe và hỗ trợ bạn. 💙': 
+        'Hello! I\'m Calmi, your AI friend. You can share anything with me. I\'m here to listen and support you. 💙',
+        'Nhập tin nhắn...': 'Type your message...',
+        
+        // Explore
+        '📚 Bài viết': '📚 Articles',
+        '🧘 Bài tập': '🧘 Exercises',
+        '🎵 Âm nhạc': '🎵 Music',
+        '5 cách giảm stress hiệu quả': '5 effective ways to reduce stress',
+        'Khám phá các phương pháp đơn giản giúp bạn giảm căng thẳng trong cuộc sống hàng ngày.': 
+        'Discover simple methods to reduce stress in daily life.',
+        'Mindfulness cho người mới bắt đầu': 'Mindfulness for beginners',
+        'Hướng dẫn cơ bản về chánh niệm và cách áp dụng vào cuộc sống.': 
+        'Basic guide to mindfulness and how to apply it in life.',
+        'Đọc thêm →': 'Read more →',
+        'Bài tập thở 4-7-8': '4-7-8 Breathing Exercise',
+        'Kỹ thuật thở giúp thư giãn và giảm lo âu': 'Breathing technique to relax and reduce anxiety',
+        'Thiền 5 phút': '5-Minute Meditation',
+        'Thiền ngắn giúp tập trung và bình tĩnh': 'Short meditation for focus and calm',
+        'Bắt đầu': 'Start',
+        'Tiếng mưa nhẹ': 'Gentle Rain Sounds',
+        'Sóng biển êm dịu': 'Calm Ocean Waves',
+        '30 phút': '30 minutes',
+        '45 phút': '45 minutes',
+        
+        // Profile
+        'Đã sử dụng:': 'Days used:',
+        'ngày': 'days',
+        'Tâm trạng trung bình': 'Average Mood',
+        'Chuỗi ghi chép': 'Recording Streak',
+        'Thành tựu': 'Achievements',
+        '0 ngày': '0 days',
+        
+        // Settings
+        'Cài đặt': 'Settings',
+        'Ngôn ngữ / Language': 'Language',
+        'Tiếng Việt': 'Vietnamese',
+        'English': 'English',
+        'Thông báo nhắc ghi tâm trạng': 'Mood reminder notifications',
+        
+        // Modals
+        'Chào mừng bạn!': 'Welcome!',
+        'Đăng nhập để bắt đầu hành trình chăm sóc sức khỏe tâm lý': 
+        'Sign in to start your mental health journey'
+    },
+    vi: {
+        // Reverse translations
+        'Login': 'Đăng nhập',
+        'Register': 'Đăng ký',
+        'Logout': 'Đăng xuất',
+        'Welcome to Calm Space': 'Chào mừng đến với Calm Space',
+        'A safe space for your mental health': 'Không gian an toàn cho sức khỏe tâm lý của bạn',
+        'Start your journey': 'Bắt đầu hành trình',
+        'Mood Diary': 'Nhật ký tâm trạng',
+        'Explore': 'Khám phá',
+        'Profile': 'Hồ sơ',
+        
+        // Tag buttons reverse - FIXED
+        '👨‍👩‍👧‍👦 Family': '👨‍👩‍👧‍👦 Gia đình',
+        '👥 Friends': '👥 Bạn bè',
+        '💼 Work': '💼 Công việc',
+        '📚 Study': '📚 Học tập',
+        '💪 Health': '💪 Sức khỏe',
+        '❤️ Love': '❤️ Tình yêu',
+        
+        'How are you feeling today?': 'Hôm nay bạn cảm thấy thế nào?',
+        'Share more about today... (optional)': 'Chia sẻ thêm về ngày hôm nay... (tùy chọn)',
+        'Select related topics:': 'Chọn chủ đề liên quan:',
+        'Save Mood': 'Lưu tâm trạng',
+        'Last week mood analysis': 'Phân tích tâm trạng tuần qua',
+        'Ready to listen to you': 'Sẵn sàng lắng nghe bạn',
+        'Type your message...': 'Nhập tin nhắn...',
+        '📚 Articles': '📚 Bài viết',
+        '🧘 Exercises': '🧘 Bài tập',
+        '🎵 Music': '🎵 Âm nhạc',
+        'Read more →': 'Đọc thêm →',
+        'Start': 'Bắt đầu',
+        'Days used:': 'Đã sử dụng:',
+        'days': 'ngày',
+        '0 days': '0 ngày',
+        'Average Mood': 'Tâm trạng trung bình',
+        'Recording Streak': 'Chuỗi ghi chép',
+        'Achievements': 'Thành tựu',
+        'Settings': 'Cài đặt',
+        'Language': 'Ngôn ngữ / Language',
+        'Vietnamese': 'Tiếng Việt',
+        'Mood reminder notifications': 'Thông báo nhắc ghi tâm trạng',
+        'Welcome!': 'Chào mừng bạn!',
+        'Sign in to start your mental health journey': 'Đăng nhập để bắt đầu hành trình chăm sóc sức khỏe tâm lý'
+    }
+};
+
+function translateToEnglish() {
+    translatePage(translations.en);
+}
+
+function translateToVietnamese() {
+    translatePage(translations.vi);
+}
+
+function translatePage(dictionary) {
+    // Translate all text elements including buttons with emoji
+    document.querySelectorAll('h1, h2, h3, h4, p, span, button, label, option, a, div').forEach(element => {
+        // Handle tag buttons specially
+        if (element.classList.contains('tag-btn')) {
+            const fullText = element.textContent.trim();
+            if (dictionary[fullText]) {
+                element.textContent = dictionary[fullText];
+            }
+        } else if (element.childNodes.length === 1 && element.childNodes[0].nodeType === 3) {
+            // Single text node
+            const text = element.textContent.trim();
+            if (text && dictionary[text]) {
+                element.textContent = dictionary[text];
+            }
+        } else {
+            // Multiple nodes - translate only text nodes
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === 3) { // Text node
+                    const text = node.textContent.trim();
+                    if (text && dictionary[text]) {
+                        node.textContent = dictionary[text];
+                    }
+                }
+            });
+        }
+    });
+    
+    // Translate placeholders
+    document.querySelectorAll('[placeholder]').forEach(element => {
+        const text = element.placeholder;
+        if (dictionary[text]) {
+            element.placeholder = dictionary[text];
+        }
+    });
+}
+
 // Notification management
 function requestNotificationPermission() {
     if ('Notification' in window) {
@@ -101,7 +296,6 @@ function requestNotificationPermission() {
 
 function scheduleNotification() {
     if (userSettings.notifications && 'Notification' in window && Notification.permission === 'granted') {
-        // Check if it's time for reminder
         const now = new Date();
         const [hours, minutes] = userSettings.notificationTime.split(':');
         const scheduledTime = new Date();
@@ -111,7 +305,6 @@ function scheduleNotification() {
             const timeout = scheduledTime - now;
             setTimeout(() => {
                 showBrowserNotification();
-                // Schedule for next day
                 setTimeout(() => scheduleNotification(), 24 * 60 * 60 * 1000);
             }, timeout);
         }
@@ -119,10 +312,14 @@ function scheduleNotification() {
 }
 
 function showBrowserNotification() {
-    new Notification('Calm Space', {
-        body: 'Đừng quên ghi lại tâm trạng của bạn hôm nay nhé! 💙',
-        icon: '/images/avatar.jpg',
-        badge: '/images/avatar.jpg'
+    const title = userSettings.language === 'en' ? 'Calm Space' : 'Calm Space';
+    const body = userSettings.language === 'en' 
+        ? "Don't forget to record your mood today! 💙"
+        : 'Đừng quên ghi lại tâm trạng của bạn hôm nay nhé! 💙';
+    
+    new Notification(title, {
+        body: body,
+        icon: '/Ảnh/logo.png'
     });
 }
 
@@ -139,21 +336,9 @@ function applyTheme(themeName) {
             '--rainbow-5': '#B3E5FF',
             '--rainbow-6': '#E0B3FF'
         },
-        sunset: {
-            '--rainbow-1': '#FF6B6B',
-            '--rainbow-2': '#FFB366',
-            '--rainbow-3': '#FFD93D',
-            '--rainbow-4': '#6BCB77',
-            '--rainbow-5': '#4D96FF',
-            '--rainbow-6': '#9D84B7'
-        },
         ocean: {
-            '--rainbow-1': '#E8F6FF',
-            '--rainbow-2': '#B8E3FF',
-            '--rainbow-3': '#7FC8F5',
-            '--rainbow-4': '#5AA7E5',
-            '--rainbow-5': '#3E7CB1',
-            '--rainbow-6': '#2C5985'
+            '--primary': '#6A5ACD',
+            '--secondary': '#20B2AA'
         }
     };
     
@@ -164,81 +349,7 @@ function applyTheme(themeName) {
     }
 }
 
-// Translation functions
-const translations = {
-    en: {
-        'Nhật ký tâm trạng': 'Mood Diary',
-        'Khám phá': 'Explore',
-        'Hồ sơ': 'Profile',
-        'Cài đặt': 'Settings',
-        'Đăng nhập': 'Login',
-        'Đăng ký': 'Register',
-        'Đăng xuất': 'Logout',
-        'Hôm nay bạn cảm thấy thế nào?': 'How are you feeling today?',
-        'Lưu tâm trạng': 'Save Mood',
-        'Chọn chủ đề liên quan:': 'Select related topics:',
-        'Gia đình': 'Family',
-        'Bạn bè': 'Friends',
-        'Công việc': 'Work',
-        'Học tập': 'Study',
-        'Sức khỏe': 'Health',
-        'Tình yêu': 'Love'
-    },
-    vi: {
-        'Mood Diary': 'Nhật ký tâm trạng',
-        'Explore': 'Khám phá',
-        'Profile': 'Hồ sơ',
-        'Settings': 'Cài đặt',
-        'Login': 'Đăng nhập',
-        'Register': 'Đăng ký',
-        'Logout': 'Đăng xuất',
-        'How are you feeling today?': 'Hôm nay bạn cảm thấy thế nào?',
-        'Save Mood': 'Lưu tâm trạng',
-        'Select related topics:': 'Chọn chủ đề liên quan:',
-        'Family': 'Gia đình',
-        'Friends': 'Bạn bè',
-        'Work': 'Công việc',
-        'Study': 'Học tập',
-        'Health': 'Sức khỏe',
-        'Love': 'Tình yêu'
-    }
-};
-
-function translateToEnglish() {
-    translatePage(translations.en);
-}
-
-function translateToVietnamese() {
-    translatePage(translations.vi);
-}
-
-function translatePage(dictionary) {
-    // Translate all text nodes
-    const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT,
-        null,
-        false
-    );
-    
-    let node;
-    while (node = walker.nextNode()) {
-        const text = node.textContent.trim();
-        if (text && dictionary[text]) {
-            node.textContent = dictionary[text];
-        }
-    }
-    
-    // Translate placeholders
-    document.querySelectorAll('[placeholder]').forEach(element => {
-        const text = element.placeholder;
-        if (dictionary[text]) {
-            element.placeholder = dictionary[text];
-        }
-    });
-}
-
-// Export settings
+// Export functions
 window.openSettings = openSettings;
 window.closeSettings = closeSettings;
 window.getUserSettings = function() {
