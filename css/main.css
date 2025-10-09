@@ -7,18 +7,12 @@
     --rainbow-5: #B3E5FF; /* Soft Blue */
     --rainbow-6: #E0B3FF; /* Soft Purple */
     
-    /* Gradient */
-    --rainbow-gradient: linear-gradient(135deg, 
-        var(--rainbow-1) 0%, 
-        var(--rainbow-2) 20%, 
-        var(--rainbow-3) 40%, 
-        var(--rainbow-4) 60%, 
-        var(--rainbow-5) 80%, 
-        var(--rainbow-6) 100%);
+    /* Ocean-Purple Gradient cho text và logo */
+    --ocean-gradient: linear-gradient(135deg, #00CED1 0%, #20B2AA 25%, #4682B4 50%, #6A5ACD 75%, #8B7FF7 100%);
     
     /* Main Colors */
-    --primary: #7C4DFF;
-    --secondary: #448AFF;
+    --primary: #6A5ACD; /* Đổi sang màu tím xanh */
+    --secondary: #20B2AA; /* Màu xanh nước biển */
     --success: #4CAF50;
     --warning: #FFC107;
     --danger: #F44336;
@@ -38,11 +32,75 @@
     box-sizing: border-box;
 }
 
+/* Animated Rainbow Background */
+@keyframes rainbowAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 body {
     font-family: 'Quicksand', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Animated Rainbow Background */
+    background: linear-gradient(-45deg, 
+        #FFB3BA, /* Soft Pink */
+        #FFDAB3, /* Soft Peach */
+        #FFFAB3, /* Soft Yellow */
+        #BAFFB3, /* Soft Green */
+        #B3E5FF, /* Soft Blue */
+        #E0B3FF, /* Soft Purple */
+        #FFB3BA  /* Back to Pink for smooth loop */
+    );
+    background-size: 400% 400%;
+    animation: rainbowAnimation 15s ease infinite;
     min-height: 100vh;
     color: var(--dark);
+}
+
+/* Alternative smoother rainbow animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(124deg, 
+        rgba(255,179,186,0.8),
+        rgba(255,218,179,0.8),
+        rgba(255,250,179,0.8),
+        rgba(186,255,179,0.8),
+        rgba(179,229,255,0.8),
+        rgba(224,179,255,0.8),
+        rgba(255,179,186,0.8)
+    );
+    background-size: 1800% 1800%;
+    animation: rainbowWave 20s ease infinite;
+    z-index: -1;
+}
+
+@keyframes rainbowWave {
+    0% {
+        background-position: 0% 82%;
+    }
+    25% {
+        background-position: 50% 20%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    75% {
+        background-position: 50% 80%;
+    }
+    100% {
+        background-position: 0% 82%;
+    }
 }
 
 /* Header Styles */
@@ -71,17 +129,37 @@ body {
     height: 50px;
     border-radius: 50%;
     border: 3px solid transparent;
-    background: var(--rainbow-gradient);
+    background: var(--ocean-gradient); /* Đổi sang ocean gradient */
     padding: 2px;
+    animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(32, 178, 170, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(106, 90, 205, 0.8);
+    }
 }
 
 .site-title {
     font-size: 1.8rem;
     font-weight: 700;
-    background: var(--rainbow-gradient);
+    background: var(--ocean-gradient); /* Đổi sang ocean gradient */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: textShimmer 3s ease-in-out infinite;
+}
+
+@keyframes textShimmer {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.2);
+    }
 }
 
 .header-right {
@@ -94,13 +172,14 @@ body {
     background: none;
     border: none;
     font-size: 1.5rem;
-    color: var(--dark);
+    color: var(--primary);
     cursor: pointer;
     transition: transform 0.3s;
 }
 
 .settings-btn:hover {
     transform: rotate(90deg);
+    color: var(--secondary);
 }
 
 .auth-buttons {
@@ -128,7 +207,16 @@ body {
     color: var(--white);
 }
 
-.btn-login:hover, .btn-register:hover {
+.btn-login:hover {
+    background: var(--primary);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-register:hover {
+    background: var(--secondary);
+    border-color: var(--secondary);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -216,7 +304,7 @@ body {
 }
 
 .nav-item.active {
-    background: var(--rainbow-gradient);
+    background: var(--ocean-gradient); /* Đổi sang ocean gradient */
     color: var(--white);
 }
 
