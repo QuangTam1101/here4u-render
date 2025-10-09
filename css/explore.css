@@ -30,6 +30,7 @@
     transition: all 0.3s;
     font-size: 1.1rem;
     font-weight: 600;
+    color: var(--dark); /* Thêm màu chữ mặc định */
 }
 
 .tab-btn:hover {
@@ -38,9 +39,15 @@
 }
 
 .tab-btn.active {
-    background: var(--rainbow-gradient);
+    background: var(--ocean-gradient); /* Đổi từ rainbow sang ocean */
     color: white;
     border-color: transparent;
+}
+
+/* Đảm bảo button không mất khi active */
+.tab-btn.active:hover {
+    background: var(--ocean-gradient);
+    opacity: 0.9;
 }
 
 /* Articles Tab */
