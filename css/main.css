@@ -11,8 +11,8 @@
     --ocean-gradient: linear-gradient(135deg, #00CED1 0%, #20B2AA 25%, #4682B4 50%, #6A5ACD 75%, #8B7FF7 100%);
     
     /* Main Colors */
-    --primary: #6A5ACD; /* Đổi sang màu tím xanh */
-    --secondary: #20B2AA; /* Màu xanh nước biển */
+    --primary: #6A5ACD; 
+    --secondary: #20B2AA; 
     --success: #4CAF50;
     --warning: #FFC107;
     --danger: #F44336;
@@ -128,10 +128,28 @@ body::before {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    border: 3px solid transparent;
-    background: var(--ocean-gradient); /* Đổi sang ocean gradient */
-    padding: 2px;
-    animation: borderGlow 3s ease-in-out infinite;
+    /* Xóa border và background */
+    border: none;
+    background: none;
+    padding: 0;
+    /* Giữ animation nếu muốn */
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Nếu muốn thêm hiệu ứng glow nhẹ */
+.logo:hover {
+    filter: drop-shadow(0 0 10px rgba(106, 90, 205, 0.5));
+    transform: scale(1.05);
+    transition: all 0.3s;
 }
 
 @keyframes borderGlow {
@@ -351,4 +369,51 @@ body::before {
     .nav-item span {
         display: none;
     }
+}
+
+.confirm-modal {
+    max-width: 400px;
+    text-align: center;
+}
+
+.confirm-modal h3 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.btn-confirm, .btn-cancel {
+    padding: 0.5rem 2rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-confirm {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-confirm:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.btn-cancel {
+    background: white;
+    color: var(--dark);
+    border: 2px solid var(--light);
+}
+
+.btn-cancel:hover {
+    background: var(--light);
+    transform: translateY(-2px);
 }
