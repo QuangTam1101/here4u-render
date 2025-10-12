@@ -43,6 +43,30 @@ function sendMessage() {
     callCalmiAPI(message);
 }
 
+//function để format markdown
+function formatMarkdown(text) {
+    // Xử lý bold text 
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+    
+    // Xử lý italic 
+    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+    
+    // Xử lý line breaks
+    text = text.replace(/\n/g, '<br>');
+    
+    // Xử lý bullet points
+    text = text.replace(/^\* /gm, '• ');
+    
+    // Xử lý numbered lists
+    text = text.replace(/^\d+\. /gm, function(match) {
+        return match;
+    });
+    
+    return text;
+}
+
 function addMessageToChat(message, sender) {
     const chatMessages = document.getElementById('chatMessages');
     
@@ -50,9 +74,14 @@ function addMessageToChat(message, sender) {
     messageDiv.className = `message ${sender === 'user' ? 'user-message' : 'calmi-message'}`;
     
     const messageText = document.createElement('p');
-    messageText.textContent = message;
-    messageDiv.appendChild(messageText);
     
+    if (sender === 'calmi') {
+        messageText.innerHTML = formatMarkdown(message);
+    } else {
+        messageText.textContent = message;
+    }
+    
+    messageDiv.appendChild(messageText);
     chatMessages.appendChild(messageDiv);
     
     // Scroll to bottom
@@ -62,6 +91,7 @@ function addMessageToChat(message, sender) {
     chatHistory.push({ sender, message, timestamp: new Date().toISOString() });
     saveChatHistory();
 }
+
 
 function showTypingIndicator() {
     if (isTyping) return; // Nếu đã có typing indicator thì không tạo nữa
@@ -140,24 +170,26 @@ function loadChatHistory() {
     if (saved) {
         chatHistory = JSON.parse(saved);
         
-        // Display last 10 messages
         const recentMessages = chatHistory.slice(-10);
         const chatMessages = document.getElementById('chatMessages');
         
-        // Clear existing messages except welcome message
         while (chatMessages.children.length > 1) {
             chatMessages.removeChild(chatMessages.lastChild);
         }
         
-        // Add messages
         recentMessages.forEach(msg => {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${msg.sender === 'user' ? 'user-message' : 'calmi-message'}`;
             
             const messageText = document.createElement('p');
-            messageText.textContent = msg.message;
-            messageDiv.appendChild(messageText);
             
+            if (msg.sender === 'calmi') {
+                messageText.innerHTML = formatMarkdown(msg.message);
+            } else {
+                messageText.textContent = msg.message;
+            }
+            
+            messageDiv.appendChild(messageText);
             chatMessages.appendChild(messageDiv);
         });
     }
