@@ -56,6 +56,38 @@
     animation: fadeIn 0.3s;
 }
 
+/* Styling cho formatted text trong chat */
+.calmi-message strong {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.calmi-message em {
+    font-style: italic;
+    color: #555;
+}
+
+.calmi-message p {
+    line-height: 1.6;
+    white-space: pre-wrap; /* Giữ line breaks */
+}
+
+.calmi-message ul,
+.calmi-message ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.calmi-message li {
+    margin: 0.3rem 0;
+}
+
+.calmi-message br + br {
+    display: block;
+    content: "";
+    margin-top: 0.5rem;
+}
+
 .calmi-message {
     background: var(--light);
     align-self: flex-start;
