@@ -3,6 +3,7 @@ let moodData = JSON.parse(localStorage.getItem('moodData')) || {};
 let selectedMood = null;
 let selectedTags = [];
 let currentDate = new Date();
+let selectedDate = null;
 
 // Initialize Mood Diary
 document.addEventListener('DOMContentLoaded', function() {
@@ -11,15 +12,30 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTagButtons();
     loadMoodData();
     updateMoodChart();
+    
+    // Mặc định chọn ngày hôm nay
+    const today = new Date();
+    selectDate(today.getFullYear(), today.getMonth(), today.getDate());
 });
 
 function initializeCalendar() {
     const calendar = document.getElementById('calendar');
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
+    const today = new Date();
     
     // Clear calendar
     calendar.innerHTML = '';
+    
+    // Add month/year navigation
+    const monthNav = document.createElement('div');
+    monthNav.className = 'month-navigation';
+    monthNav.innerHTML = `
+        <button onclick="previousMonth()">‹</button>
+        <span>${getMonthName(month)} ${year}</span>
+        <button onclick="nextMonth()">›</button>
+    `;
+    calendar.appendChild(monthNav);
     
     // Add day headers
     const dayHeaders = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
@@ -48,27 +64,73 @@ function initializeCalendar() {
         dayElement.className = 'calendar-day';
         dayElement.textContent = day;
         
+        const dateObj = new Date(year, month, day);
         const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         
-        // Check if mood exists for this day
-        if (moodData[dateKey]) {
-            const mood = moodData[dateKey].mood;
-            if (mood <= 2) dayElement.classList.add('sad');
-            else if (mood >= 4) dayElement.classList.add('happy');
-            else dayElement.classList.add('neutral');
+        // Check if this is future date
+        if (dateObj > today) {
+            dayElement.classList.add('future-day');
+            dayElement.style.opacity = '0.3';
+            dayElement.style.cursor = 'not-allowed';
+        } else {
+            // Check if mood exists for this day
+            if (moodData[dateKey]) {
+                const mood = moodData[dateKey].mood;
+                if (mood <= 2) dayElement.classList.add('sad');
+                else if (mood >= 4) dayElement.classList.add('happy');
+                else dayElement.classList.add('neutral');
+            }
+            
+            // Add click event only for today and past dates
+            dayElement.addEventListener('click', function() {
+                selectDate(year, month, day);
+            });
         }
         
-        // Add click event
-        dayElement.addEventListener('click', function() {
-            selectDate(year, month, day);
-        });
+        // Highlight today
+        if (year === today.getFullYear() && 
+            month === today.getMonth() && 
+            day === today.getDate()) {
+            dayElement.classList.add('today');
+        }
+        
+        // Highlight selected date
+        if (selectedDate && 
+            year === selectedDate.getFullYear() && 
+            month === selectedDate.getMonth() && 
+            day === selectedDate.getDate()) {
+            dayElement.classList.add('selected-day');
+        }
         
         calendar.appendChild(dayElement);
     }
 }
 
 function selectDate(year, month, day) {
+    const selected = new Date(year, month, day);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Set to end of today
+    
+    // Check if selected date is in the future
+    if (selected > today) {
+        showNotification('Không thể chọn ngày trong tương lai!', 'error');
+        return;
+    }
+    
+    // Set selected date
+    selectedDate = selected;
+    
     const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    
+    // Update header to show selected date
+    const header = document.querySelector('.mood-input-section h3');
+    if (header) {
+        const dateStr = formatDate(selected);
+        const isToday = isSameDay(selected, new Date());
+        header.textContent = isToday ? 
+            'Hôm nay bạn cảm thấy thế nào?' : 
+            `Ngày ${dateStr} bạn cảm thấy thế nào?`;
+    }
     
     // Load existing mood data if exists
     if (moodData[dateKey]) {
@@ -80,6 +142,12 @@ function selectDate(year, month, day) {
         // Update UI
         updateMoodButtons();
         updateTagButtons();
+        
+        // Show edit mode indicator
+        const saveBtn = document.querySelector('.save-mood-btn');
+        if (saveBtn) {
+            saveBtn.textContent = 'Cập nhật tâm trạng';
+        }
     } else {
         // Reset form
         selectedMood = null;
@@ -87,6 +155,89 @@ function selectDate(year, month, day) {
         document.getElementById('moodNote').value = '';
         updateMoodButtons();
         updateTagButtons();
+        
+        // Reset button text
+        const saveBtn = document.querySelector('.save-mood-btn');
+        if (saveBtn) {
+            saveBtn.textContent = 'Lưu tâm trạng';
+        }
+    }
+    
+    // Update calendar to show selection
+    initializeCalendar();
+}
+
+// Helper functions
+function getMonthName(month) {
+    const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                   'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+    return months[month];
+}
+
+function formatDate(date) {
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+}
+
+function isSameDay(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+}
+
+function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    initializeCalendar();
+}
+
+function nextMonth() {
+    const today = new Date();
+    const nextMonth = new Date(currentDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    
+    // Don't allow navigating to future months
+    if (nextMonth.getMonth() <= today.getMonth() || 
+        nextMonth.getFullYear() < today.getFullYear()) {
+        currentDate = nextMonth;
+        initializeCalendar();
+    } else {
+        showNotification('Không thể xem tháng trong tương lai!', 'warning');
+    }
+}
+
+// Helper functions
+function getMonthName(month) {
+    const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                   'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+    return months[month];
+}
+
+function formatDate(date) {
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+}
+
+function isSameDay(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+}
+
+function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    initializeCalendar();
+}
+
+function nextMonth() {
+    const today = new Date();
+    const nextMonth = new Date(currentDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    
+    // Don't allow navigating to future months
+    if (nextMonth.getMonth() <= today.getMonth() || 
+        nextMonth.getFullYear() < today.getFullYear()) {
+        currentDate = nextMonth;
+        initializeCalendar();
+    } else {
+        showNotification('Không thể xem tháng trong tương lai!', 'warning');
     }
 }
 
@@ -139,8 +290,16 @@ function saveMood() {
         return;
     }
     
-    const today = new Date();
-    const dateKey = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+    if (!selectedDate) {
+        showNotification('Vui lòng chọn ngày!', 'error');
+        return;
+    }
+    
+    // Use selected date instead of today
+    const dateKey = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
+    
+    // Check if updating existing mood
+    const isUpdate = !!moodData[dateKey];
     
     // Save mood data
     moodData[dateKey] = {
@@ -160,7 +319,10 @@ function saveMood() {
     updateMoodChart();
     
     // Show success message
-    showNotification('Đã lưu tâm trạng của bạn!', 'success');
+    const message = isUpdate ? 
+        'Đã cập nhật tâm trạng!' : 
+        'Đã lưu tâm trạng của bạn!';
+    showNotification(message, 'success');
     
     // Reset form
     selectedMood = null;
@@ -168,6 +330,10 @@ function saveMood() {
     document.getElementById('moodNote').value = '';
     updateMoodButtons();
     updateTagButtons();
+    
+    // Reset to today
+    const today = new Date();
+    selectDate(today.getFullYear(), today.getMonth(), today.getDate());
 }
 
 function loadMoodData() {
