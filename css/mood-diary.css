@@ -180,5 +180,128 @@
     .mood-analytics {
         grid-column: span 1;
     }
+}
 
+/* Calendar navigation */
+.month-navigation {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.month-navigation button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: all 0.3s;
+}
+
+.month-navigation button:hover {
+    transform: scale(1.2);
+    color: var(--secondary);
+}
+
+/* Calendar day styles */
+.calendar-day {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--light);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.calendar-day:hover:not(.future-day) {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+/* Today indicator */
+.calendar-day.today {
+    border: 2px solid var(--primary);
+    font-weight: 700;
+}
+
+.calendar-day.today::after {
+    content: '•';
+    position: absolute;
+    bottom: 2px;
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+/* Selected day */
+.calendar-day.selected-day {
+    background: var(--primary) !important;
+    color: white !important;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(106, 90, 205, 0.4);
+}
+
+/* Future days (disabled) */
+.calendar-day.future-day {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: #f0f0f0;
+}
+
+.calendar-day.future-day:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Mood colors (existing moods) */
+.calendar-day.happy {
+    background: #4CAF50;
+    color: white;
+}
+
+.calendar-day.sad {
+    background: #F44336;
+    color: white;
+}
+
+.calendar-day.neutral {
+    background: #FFC107;
+    color: white;
+}
+
+/* Selected day with mood */
+.calendar-day.selected-day.happy,
+.calendar-day.selected-day.sad,
+.calendar-day.selected-day.neutral {
+    box-shadow: 0 0 0 3px var(--primary), 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Update save button when editing */
+.save-mood-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.save-mood-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.save-mood-btn:hover::before {
+    left: 100%;
 }
