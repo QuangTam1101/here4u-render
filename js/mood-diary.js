@@ -1,82 +1,9 @@
-// Mood Diary Management with Language Support
+// Mood Diary Management
 let moodData = JSON.parse(localStorage.getItem('moodData')) || {};
 let selectedMood = null;
 let selectedTags = [];
 let currentDate = new Date();
 let selectedDate = null;
-
-// Translation strings
-const translations = {
-    vi: {
-        monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-                    'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-        dayHeaders: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
-        howFeeling: 'Hôm nay bạn cảm thấy thế nào?',
-        howFeelingDate: 'Ngày {date} bạn cảm thấy thế nào?',
-        cannotSelectFuture: 'Không thể chọn ngày trong tương lai!',
-        cannotViewFuture: 'Không thể xem tháng trong tương lai!',
-        selectMood: 'Vui lòng chọn tâm trạng của bạn!',
-        selectDate: 'Vui lòng chọn ngày!',
-        moodUpdated: 'Đã cập nhật tâm trạng!',
-        moodSaved: 'Đã lưu tâm trạng của bạn!',
-        updateMood: 'Cập nhật tâm trạng',
-        saveMood: 'Lưu tâm trạng',
-        moodLabel: 'Tâm trạng',
-        topFactors: 'Yếu tố ảnh hưởng nhiều nhất:',
-        tagNames: {
-            family: '👨‍👩‍👧‍👦 Gia đình',
-            friends: '👥 Bạn bè',
-            work: '💼 Công việc',
-            study: '📚 Học tập',
-            health: '💪 Sức khỏe',
-            love: '❤️ Tình yêu'
-        }
-    },
-    en: {
-        monthNames: ['January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'],
-        dayHeaders: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        howFeeling: 'How are you feeling today?',
-        howFeelingDate: 'How did you feel on {date}?',
-        cannotSelectFuture: 'Cannot select future dates!',
-        cannotViewFuture: 'Cannot view future months!',
-        selectMood: 'Please select your mood!',
-        selectDate: 'Please select a date!',
-        moodUpdated: 'Mood updated!',
-        moodSaved: 'Your mood has been saved!',
-        updateMood: 'Update Mood',
-        saveMood: 'Save Mood',
-        moodLabel: 'Mood',
-        topFactors: 'Top influencing factors:',
-        tagNames: {
-            family: '👨‍👩‍👧‍👦 Family',
-            friends: '👥 Friends',
-            work: '💼 Work',
-            study: '📚 Study',
-            health: '💪 Health',
-            love: '❤️ Love'
-        }
-    }
-};
-
-// Get current language
-function getCurrentLanguage() {
-    const settings = JSON.parse(localStorage.getItem('userSettings') || '{}');
-    return settings.language || 'vi';
-}
-
-// Get translation
-function t(key, params = {}) {
-    const lang = getCurrentLanguage();
-    let text = translations[lang][key] || translations['vi'][key];
-    
-    // Replace parameters
-    Object.keys(params).forEach(param => {
-        text = text.replace(`{${param}}`, params[param]);
-    });
-    
-    return text;
-}
 
 // Initialize Mood Diary
 document.addEventListener('DOMContentLoaded', function() {
@@ -86,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadMoodData();
     updateMoodChart();
     
+    // Mặc định chọn ngày hôm nay
     const today = new Date();
     selectDate(today.getFullYear(), today.getMonth(), today.getDate());
 });
@@ -95,8 +23,8 @@ function initializeCalendar() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const today = new Date();
-    const lang = getCurrentLanguage();
     
+    // Clear calendar
     calendar.innerHTML = '';
     
     // Add month/year navigation
@@ -110,7 +38,7 @@ function initializeCalendar() {
     calendar.appendChild(monthNav);
     
     // Add day headers
-    const dayHeaders = t('dayHeaders');
+    const dayHeaders = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
     dayHeaders.forEach(day => {
         const header = document.createElement('div');
         header.className = 'calendar-header';
@@ -181,13 +109,15 @@ function initializeCalendar() {
 function selectDate(year, month, day) {
     const selected = new Date(year, month, day);
     const today = new Date();
-    today.setHours(23, 59, 59, 999);
+    today.setHours(23, 59, 59, 999); // Set to end of today
     
+    // Check if selected date is in the future
     if (selected > today) {
-        showNotification(t('cannotSelectFuture'), 'error');
+        showNotification('Không thể chọn ngày trong tương lai!', 'error');
         return;
     }
     
+    // Set selected date
     selectedDate = selected;
     
     const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
@@ -198,8 +128,8 @@ function selectDate(year, month, day) {
         const dateStr = formatDate(selected);
         const isToday = isSameDay(selected, new Date());
         header.textContent = isToday ? 
-            t('howFeeling') : 
-            t('howFeelingDate', { date: dateStr });
+            'Hôm nay bạn cảm thấy thế nào?' : 
+            `Ngày ${dateStr} bạn cảm thấy thế nào?`;
     }
     
     // Load existing mood data if exists
@@ -209,39 +139,42 @@ function selectDate(year, month, day) {
         document.getElementById('moodNote').value = data.note || '';
         selectedTags = data.tags || [];
         
+        // Update UI
         updateMoodButtons();
         updateTagButtons();
         
+        // Show edit mode indicator
         const saveBtn = document.querySelector('.save-mood-btn');
         if (saveBtn) {
-            saveBtn.textContent = t('updateMood');
+            saveBtn.textContent = 'Cập nhật tâm trạng';
         }
     } else {
+        // Reset form
         selectedMood = null;
         selectedTags = [];
         document.getElementById('moodNote').value = '';
         updateMoodButtons();
         updateTagButtons();
         
+        // Reset button text
         const saveBtn = document.querySelector('.save-mood-btn');
         if (saveBtn) {
-            saveBtn.textContent = t('saveMood');
+            saveBtn.textContent = 'Lưu tâm trạng';
         }
     }
     
+    // Update calendar to show selection
     initializeCalendar();
 }
 
+// Helper functions
 function getMonthName(month) {
-    const monthNames = t('monthNames');
-    return monthNames[month];
+    const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                   'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+    return months[month];
 }
 
 function formatDate(date) {
-    const lang = getCurrentLanguage();
-    if (lang === 'en') {
-        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-    }
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 }
 
@@ -261,138 +194,53 @@ function nextMonth() {
     const nextMonth = new Date(currentDate);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     
+    // Don't allow navigating to future months
     if (nextMonth.getMonth() <= today.getMonth() || 
         nextMonth.getFullYear() < today.getFullYear()) {
         currentDate = nextMonth;
         initializeCalendar();
     } else {
-        showNotification(t('cannotViewFuture'), 'warning');
+        showNotification('Không thể xem tháng trong tương lai!', 'warning');
     }
 }
 
-function saveMood() {
-    if (!selectedMood) {
-        showNotification(t('selectMood'), 'error');
-        return;
-    }
-    
-    if (!selectedDate) {
-        showNotification(t('selectDate'), 'error');
-        return;
-    }
-    
-    const dateKey = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
-    
-    const isUpdate = !!moodData[dateKey];
-    
-    moodData[dateKey] = {
-        mood: selectedMood,
-        note: document.getElementById('moodNote').value,
-        tags: selectedTags,
-        timestamp: new Date().toISOString()
-    };
-    
-    localStorage.setItem('moodData', JSON.stringify(moodData));
-    
+// Helper functions
+function getMonthName(month) {
+    const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                   'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+    return months[month];
+}
+
+function formatDate(date) {
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+}
+
+function isSameDay(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+}
+
+function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
     initializeCalendar();
-    updateMoodChart();
-    
-    const message = isUpdate ? t('moodUpdated') : t('moodSaved');
-    showNotification(message, 'success');
-    
-    selectedMood = null;
-    selectedTags = [];
-    document.getElementById('moodNote').value = '';
-    updateMoodButtons();
-    updateTagButtons();
-    
+}
+
+function nextMonth() {
     const today = new Date();
-    selectDate(today.getFullYear(), today.getMonth(), today.getDate());
-}
-
-function updateMoodChart() {
-    const ctx = document.getElementById('moodChart');
-    if (!ctx) return;
+    const nextMonth = new Date(currentDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
     
-    const labels = [];
-    const data = [];
-    
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dateKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-        
-        labels.push(`${date.getDate()}/${date.getMonth() + 1}`);
-        data.push(moodData[dateKey] ? moodData[dateKey].mood : null);
+    // Don't allow navigating to future months
+    if (nextMonth.getMonth() <= today.getMonth() || 
+        nextMonth.getFullYear() < today.getFullYear()) {
+        currentDate = nextMonth;
+        initializeCalendar();
+    } else {
+        showNotification('Không thể xem tháng trong tương lai!', 'warning');
     }
-    
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: t('moodLabel'),
-                data: data,
-                borderColor: 'rgb(124, 77, 255)',
-                backgroundColor: 'rgba(124, 77, 255, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 5,
-                    ticks: {
-                        callback: function(value) {
-                            const moods = ['', '😢', '😔', '😐', '🙂', '😄'];
-                            return moods[value] || '';
-                        }
-                    }
-                }
-            }
-        }
-    });
-    
-    updateTopFactors();
 }
 
-function updateTopFactors() {
-    const factorCounts = {};
-    
-    Object.values(moodData).forEach(entry => {
-        if (entry.tags) {
-            entry.tags.forEach(tag => {
-                factorCounts[tag] = (factorCounts[tag] || 0) + 1;
-            });
-        }
-    });
-    
-    const topFactors = Object.entries(factorCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3);
-    
-    const container = document.getElementById('topFactors');
-    container.innerHTML = `<h4>${t('topFactors')}</h4>`;
-    
-    const tagNames = t('tagNames');
-    
-    topFactors.forEach(([tag, count]) => {
-        const badge = document.createElement('div');
-        badge.className = 'factor-badge';
-        badge.innerHTML = `${tagNames[tag]} (${count})`;
-        container.appendChild(badge);
-    });
-}
-
-// Keep existing button initialization functions
 function initializeMoodButtons() {
     document.querySelectorAll('.mood-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -436,9 +284,155 @@ function updateTagButtons() {
     });
 }
 
+function saveMood() {
+    if (!selectedMood) {
+        showNotification('Vui lòng chọn tâm trạng của bạn!', 'error');
+        return;
+    }
+    
+    if (!selectedDate) {
+        showNotification('Vui lòng chọn ngày!', 'error');
+        return;
+    }
+    
+    // Use selected date instead of today
+    const dateKey = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
+    
+    // Check if updating existing mood
+    const isUpdate = !!moodData[dateKey];
+    
+    // Save mood data
+    moodData[dateKey] = {
+        mood: selectedMood,
+        note: document.getElementById('moodNote').value,
+        tags: selectedTags,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Save to localStorage
+    localStorage.setItem('moodData', JSON.stringify(moodData));
+    
+    // Update calendar
+    initializeCalendar();
+    
+    // Update chart
+    updateMoodChart();
+    
+    // Show success message
+    const message = isUpdate ? 
+        'Đã cập nhật tâm trạng!' : 
+        'Đã lưu tâm trạng của bạn!';
+    showNotification(message, 'success');
+    
+    // Reset form
+    selectedMood = null;
+    selectedTags = [];
+    document.getElementById('moodNote').value = '';
+    updateMoodButtons();
+    updateTagButtons();
+    
+    // Reset to today
+    const today = new Date();
+    selectDate(today.getFullYear(), today.getMonth(), today.getDate());
+}
+
 function loadMoodData() {
     const saved = localStorage.getItem('moodData');
     if (saved) {
         moodData = JSON.parse(saved);
     }
+}
+
+function updateMoodChart() {
+    const ctx = document.getElementById('moodChart');
+    if (!ctx) return;
+    
+    // Get last 7 days data
+    const labels = [];
+    const data = [];
+    
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        
+        labels.push(`${date.getDate()}/${date.getMonth() + 1}`);
+        data.push(moodData[dateKey] ? moodData[dateKey].mood : null);
+    }
+    
+    // Create chart
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Tâm trạng',
+                data: data,
+                borderColor: 'rgb(124, 77, 255)',
+                backgroundColor: 'rgba(124, 77, 255, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5,
+                    ticks: {
+                        callback: function(value) {
+                            const moods = ['', '😢', '😔', '😐', '🙂', '😄'];
+                            return moods[value] || '';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Update top factors
+    updateTopFactors();
+}
+
+function updateTopFactors() {
+    const factorCounts = {};
+    
+    // Count tags
+    Object.values(moodData).forEach(entry => {
+        if (entry.tags) {
+            entry.tags.forEach(tag => {
+                factorCounts[tag] = (factorCounts[tag] || 0) + 1;
+            });
+        }
+    });
+    
+    // Sort and display top factors
+    const topFactors = Object.entries(factorCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+    
+    const container = document.getElementById('topFactors');
+    container.innerHTML = '<h4>Yếu tố ảnh hưởng nhiều nhất:</h4>';
+    
+    const tagNames = {
+        family: '👨‍👩‍👧‍👦 Gia đình',
+        friends: '👥 Bạn bè',
+        work: '💼 Công việc',
+        study: '📚 Học tập',
+        health: '💪 Sức khỏe',
+        love: '❤️ Tình yêu'
+    };
+    
+    topFactors.forEach(([tag, count]) => {
+        const badge = document.createElement('div');
+        badge.className = 'factor-badge';
+        badge.innerHTML = `${tagNames[tag]} (${count})`;
+        container.appendChild(badge);
+    });
 }
