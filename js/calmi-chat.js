@@ -1,5 +1,5 @@
 // Calmi Chat Management
-let chatHistory = [];
+//let chatHistory = [];
 let isTyping = false;
 
 // Initialize Chat
@@ -202,3 +202,4 @@ function saveChatHistory() {
     }
     localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
 }
+
