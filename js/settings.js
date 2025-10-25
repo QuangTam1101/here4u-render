@@ -1,4 +1,4 @@
-// settings.js
+// settings.js - FIXED VERSION với confirm dialog và translation emoji
 let userSettings = {
     language: 'vi',
     notifications: true,
@@ -355,4 +355,3 @@ window.closeSettings = closeSettings;
 window.getUserSettings = function() {
     return userSettings;
 };
-
