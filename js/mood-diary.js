@@ -1,9 +1,85 @@
-// Mood Diary Management
 let moodData = JSON.parse(localStorage.getItem('moodData')) || {};
 let selectedMood = null;
 let selectedTags = [];
 let currentDate = new Date();
 let selectedDate = null;
+
+// Helper function to get current language
+function getCurrentLanguage() {
+    const settings = localStorage.getItem('userSettings');
+    if (settings) {
+        const parsed = JSON.parse(settings);
+        return parsed.language || 'vi';
+    }
+    return 'vi';
+}
+
+// Translation dictionary for mood diary specific texts
+const moodDiaryTranslations = {
+    en: {
+        'Hôm nay bạn cảm thấy thế nào?': 'How are you feeling today?',
+        'Ngày': 'Date',
+        'bạn cảm thấy thế nào?': 'how did you feel?',
+        'Lưu tâm trạng': 'Save Mood',
+        'Cập nhật tâm trạng': 'Update Mood',
+        'Yếu tố ảnh hưởng nhiều nhất:': 'Most influential factors:',
+        'Vui lòng chọn tâm trạng của bạn!': 'Please select your mood!',
+        'Vui lòng chọn ngày!': 'Please select a date!',
+        'Đã cập nhật tâm trạng!': 'Mood updated!',
+        'Đã lưu tâm trạng của bạn!': 'Your mood has been saved!',
+        'Không thể chọn ngày trong tương lai!': 'Cannot select future dates!',
+        'Không thể xem tháng trong tương lai!': 'Cannot view future months!',
+        'Tháng 1': 'January',
+        'Tháng 2': 'February',
+        'Tháng 3': 'March',
+        'Tháng 4': 'April',
+        'Tháng 5': 'May',
+        'Tháng 6': 'June',
+        'Tháng 7': 'July',
+        'Tháng 8': 'August',
+        'Tháng 9': 'September',
+        'Tháng 10': 'October',
+        'Tháng 11': 'November',
+        'Tháng 12': 'December'
+    },
+    vi: {
+        'How are you feeling today?': 'Hôm nay bạn cảm thấy thế nào?',
+        'Date': 'Ngày',
+        'how did you feel?': 'bạn cảm thấy thế nào?',
+        'Save Mood': 'Lưu tâm trạng',
+        'Update Mood': 'Cập nhật tâm trạng',
+        'Most influential factors:': 'Yếu tố ảnh hưởng nhiều nhất:',
+        'Please select your mood!': 'Vui lòng chọn tâm trạng của bạn!',
+        'Please select a date!': 'Vui lòng chọn ngày!',
+        'Mood updated!': 'Đã cập nhật tâm trạng!',
+        'Your mood has been saved!': 'Đã lưu tâm trạng của bạn!',
+        'Cannot select future dates!': 'Không thể chọn ngày trong tương lai!',
+        'Cannot view future months!': 'Không thể xem tháng trong tương lai!',
+        'January': 'Tháng 1',
+        'February': 'Tháng 2',
+        'March': 'Tháng 3',
+        'April': 'Tháng 4',
+        'May': 'Tháng 5',
+        'June': 'Tháng 6',
+        'July': 'Tháng 7',
+        'August': 'Tháng 8',
+        'September': 'Tháng 9',
+        'October': 'Tháng 10',
+        'November': 'Tháng 11',
+        'December': 'Tháng 12'
+    }
+};
+
+// Helper function to translate mood diary texts
+function translateMoodText(text) {
+    const lang = getCurrentLanguage();
+    if (lang === 'en' && moodDiaryTranslations.en[text]) {
+        return moodDiaryTranslations.en[text];
+    } else if (lang === 'vi' && moodDiaryTranslations.vi[text]) {
+        return moodDiaryTranslations.vi[text];
+    }
+    return text;
+}
 
 // Initialize Mood Diary
 document.addEventListener('DOMContentLoaded', function() {
@@ -32,13 +108,16 @@ function initializeCalendar() {
     monthNav.className = 'month-navigation';
     monthNav.innerHTML = `
         <button onclick="previousMonth()">‹</button>
-        <span>${getMonthName(month)} ${year}</span>
+        <span>${translateMoodText(getMonthName(month))} ${year}</span>
         <button onclick="nextMonth()">›</button>
     `;
     calendar.appendChild(monthNav);
     
     // Add day headers
-    const dayHeaders = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    const dayHeaders = getCurrentLanguage() === 'en' 
+        ? ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+        : ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    
     dayHeaders.forEach(day => {
         const header = document.createElement('div');
         header.className = 'calendar-header';
@@ -113,7 +192,7 @@ function selectDate(year, month, day) {
     
     // Check if selected date is in the future
     if (selected > today) {
-        showNotification('Không thể chọn ngày trong tương lai!', 'error');
+        showNotification(translateMoodText('Không thể chọn ngày trong tương lai!'), 'error');
         return;
     }
     
@@ -122,14 +201,24 @@ function selectDate(year, month, day) {
     
     const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
     
-    // Update header to show selected date
+    // Update header to show selected date with proper translation
     const header = document.querySelector('.mood-input-section h3');
     if (header) {
-        const dateStr = formatDate(selected);
         const isToday = isSameDay(selected, new Date());
-        header.textContent = isToday ? 
-            'Hôm nay bạn cảm thấy thế nào?' : 
-            `Ngày ${dateStr} bạn cảm thấy thế nào?`;
+        const lang = getCurrentLanguage();
+        
+        if (isToday) {
+            header.textContent = lang === 'en' 
+                ? 'How are you feeling today?'
+                : 'Hôm nay bạn cảm thấy thế nào?';
+        } else {
+            const dateStr = formatDate(selected);
+            if (lang === 'en') {
+                header.textContent = `How did you feel on ${dateStr}?`;
+            } else {
+                header.textContent = `Ngày ${dateStr} bạn cảm thấy thế nào?`;
+            }
+        }
     }
     
     // Load existing mood data if exists
@@ -143,10 +232,10 @@ function selectDate(year, month, day) {
         updateMoodButtons();
         updateTagButtons();
         
-        // Show edit mode indicator
+        // Show edit mode indicator with translation
         const saveBtn = document.querySelector('.save-mood-btn');
         if (saveBtn) {
-            saveBtn.textContent = 'Cập nhật tâm trạng';
+            saveBtn.textContent = translateMoodText('Cập nhật tâm trạng');
         }
     } else {
         // Reset form
@@ -156,10 +245,10 @@ function selectDate(year, month, day) {
         updateMoodButtons();
         updateTagButtons();
         
-        // Reset button text
+        // Reset button text with translation
         const saveBtn = document.querySelector('.save-mood-btn');
         if (saveBtn) {
-            saveBtn.textContent = 'Lưu tâm trạng';
+            saveBtn.textContent = translateMoodText('Lưu tâm trạng');
         }
     }
     
@@ -200,44 +289,7 @@ function nextMonth() {
         currentDate = nextMonth;
         initializeCalendar();
     } else {
-        showNotification('Không thể xem tháng trong tương lai!', 'warning');
-    }
-}
-
-// Helper functions
-function getMonthName(month) {
-    const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-                   'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-    return months[month];
-}
-
-function formatDate(date) {
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-}
-
-function isSameDay(date1, date2) {
-    return date1.getFullYear() === date2.getFullYear() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getDate() === date2.getDate();
-}
-
-function previousMonth() {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    initializeCalendar();
-}
-
-function nextMonth() {
-    const today = new Date();
-    const nextMonth = new Date(currentDate);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    
-    // Don't allow navigating to future months
-    if (nextMonth.getMonth() <= today.getMonth() || 
-        nextMonth.getFullYear() < today.getFullYear()) {
-        currentDate = nextMonth;
-        initializeCalendar();
-    } else {
-        showNotification('Không thể xem tháng trong tương lai!', 'warning');
+        showNotification(translateMoodText('Không thể xem tháng trong tương lai!'), 'warning');
     }
 }
 
@@ -286,12 +338,12 @@ function updateTagButtons() {
 
 function saveMood() {
     if (!selectedMood) {
-        showNotification('Vui lòng chọn tâm trạng của bạn!', 'error');
+        showNotification(translateMoodText('Vui lòng chọn tâm trạng của bạn!'), 'error');
         return;
     }
     
     if (!selectedDate) {
-        showNotification('Vui lòng chọn ngày!', 'error');
+        showNotification(translateMoodText('Vui lòng chọn ngày!'), 'error');
         return;
     }
     
@@ -318,10 +370,10 @@ function saveMood() {
     // Update chart
     updateMoodChart();
     
-    // Show success message
-    const message = isUpdate ? 
-        'Đã cập nhật tâm trạng!' : 
-        'Đã lưu tâm trạng của bạn!';
+    // Show success message with translation
+    const message = isUpdate 
+        ? translateMoodText('Đã cập nhật tâm trạng!')
+        : translateMoodText('Đã lưu tâm trạng của bạn!');
     showNotification(message, 'success');
     
     // Reset form
@@ -366,7 +418,7 @@ function updateMoodChart() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Tâm trạng',
+                label: getCurrentLanguage() === 'en' ? 'Mood' : 'Tâm trạng',
                 data: data,
                 borderColor: 'rgb(124, 77, 255)',
                 backgroundColor: 'rgba(124, 77, 255, 0.1)',
@@ -418,15 +470,21 @@ function updateTopFactors() {
         .slice(0, 3);
     
     const container = document.getElementById('topFactors');
-    container.innerHTML = '<h4>Yếu tố ảnh hưởng nhiều nhất:</h4>';
+    const lang = getCurrentLanguage();
+    
+    // Use proper translation for header
+    const headerText = lang === 'en' 
+        ? 'Most influential factors:' 
+        : 'Yếu tố ảnh hưởng nhiều nhất:';
+    container.innerHTML = `<h4>${headerText}</h4>`;
     
     const tagNames = {
-        family: '👨‍👩‍👧‍👦 Gia đình',
-        friends: '👥 Bạn bè',
-        work: '💼 Công việc',
-        study: '📚 Học tập',
-        health: '💪 Sức khỏe',
-        love: '❤️ Tình yêu'
+        family: lang === 'en' ? '👨‍👩‍👧‍👦 Family' : '👨‍👩‍👧‍👦 Gia đình',
+        friends: lang === 'en' ? '👥 Friends' : '👥 Bạn bè',
+        work: lang === 'en' ? '💼 Work' : '💼 Công việc',
+        study: lang === 'en' ? '📚 Study' : '📚 Học tập',
+        health: lang === 'en' ? '💪 Health' : '💪 Sức khỏe',
+        love: lang === 'en' ? '❤️ Love' : '❤️ Tình yêu'
     };
     
     topFactors.forEach(([tag, count]) => {
@@ -436,3 +494,15 @@ function updateTopFactors() {
         container.appendChild(badge);
     });
 }
+
+// Add event listener for language changes to refresh mood diary
+window.addEventListener('languageChanged', function() {
+    const today = new Date();
+    if (selectedDate) {
+        selectDate(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+    } else {
+        selectDate(today.getFullYear(), today.getMonth(), today.getDate());
+    }
+    
+    updateMoodChart();
+});
