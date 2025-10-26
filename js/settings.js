@@ -62,7 +62,7 @@ function initializeSettingsHandlers() {
                 }
                 
                 window.dispatchEvent(new Event('languageChanged'));
-                
+
                 showNotification(
                     newLang === 'en' ? 'Language changed to English' : 'Đã đổi ngôn ngữ sang Tiếng Việt',
                     'success'
@@ -151,6 +151,7 @@ const translations = {
         'Xin chào! Mình là Calmi, người bạn AI của bạn. Bạn có thể chia sẻ với mình bất cứ điều gì. Mình ở đây để lắng nghe và hỗ trợ bạn. 💙': 
         'Hello! I\'m Calmi, your AI friend. You can share anything with me. I\'m here to listen and support you. 💙',
         'Nhập tin nhắn...': 'Type your message...',
+        'Xóa lịch sử chat': 'Clear chat history',
         
         // Explore
         '📚 Bài viết': '📚 Articles',
@@ -204,6 +205,8 @@ const translations = {
         'Mood Diary': 'Nhật ký tâm trạng',
         'Explore': 'Khám phá',
         'Profile': 'Hồ sơ',
+
+        'Clear chat history': 'Xóa lịch sử chat',
         
         // Tag buttons reverse - FIXED
         '👨‍👩‍👧‍👦 Family': '👨‍👩‍👧‍👦 Gia đình',
