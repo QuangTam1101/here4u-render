@@ -61,6 +61,8 @@ function initializeSettingsHandlers() {
                     translateToVietnamese();
                 }
                 
+                window.dispatchEvent(new Event('languageChanged'));
+                
                 showNotification(
                     newLang === 'en' ? 'Language changed to English' : 'Đã đổi ngôn ngữ sang Tiếng Việt',
                     'success'
