@@ -300,16 +300,118 @@ function saveChatHistory() {
     localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
 }
 
-// Clear chat function (optional)
+// Clear chat function
 function clearChat() {
     const lang = getCurrentLanguage();
-    if (confirm(lang === 'en' ? 'Clear all chat history?' : 'Xóa toàn bộ lịch sử chat?')) {
+    
+    // Create custom confirmation dialog
+    const overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay';
+    
+    const dialog = document.createElement('div');
+    dialog.className = 'confirm-dialog';
+    
+    dialog.innerHTML = `
+        <h3>${lang === 'en' ? 'Clear Chat History' : 'Xóa lịch sử chat'}</h3>
+        <p>${lang === 'en' 
+            ? 'Are you sure you want to clear all chat history? This action cannot be undone.' 
+            : 'Bạn có chắc muốn xóa toàn bộ lịch sử chat? Hành động này không thể hoàn tác.'}</p>
+        <div class="confirm-dialog-buttons">
+            <button class="confirm-btn" id="confirmClear">
+                ${lang === 'en' ? 'Clear' : 'Xóa'}
+            </button>
+            <button class="cancel-btn" id="cancelClear">
+                ${lang === 'en' ? 'Cancel' : 'Hủy'}
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(dialog);
+    
+    // Handle confirm button
+    document.getElementById('confirmClear').addEventListener('click', function() {
+        // Clear chat history from memory and storage
         chatHistory = [];
         localStorage.removeItem('chatHistory');
+        
+        // Clear chat messages from UI
         const chatMessages = document.getElementById('chatMessages');
-        while (chatMessages.children.length > 0) {
-            chatMessages.removeChild(chatMessages.lastChild);
+        while (chatMessages.firstChild) {
+            chatMessages.removeChild(chatMessages.firstChild);
         }
+        
+        // Show welcome message again
+        showWelcomeMessage();
+        
+        // Remove dialog
+        document.body.removeChild(overlay);
+        document.body.removeChild(dialog);
+        
+        // Show success notification
+        showNotification(
+            lang === 'en' 
+                ? 'Chat history cleared successfully' 
+                : 'Đã xóa lịch sử chat thành công',
+            'success'
+        );
+    });
+    
+    // Handle cancel button
+    document.getElementById('cancelClear').addEventListener('click', function() {
+        document.body.removeChild(overlay);
+        document.body.removeChild(dialog);
+    });
+    
+    // Click overlay to close
+    overlay.addEventListener('click', function() {
+        document.body.removeChild(overlay);
+        document.body.removeChild(dialog);
+    });
+}
+
+window.addEventListener('languageChanged', function() {
+    const lang = getCurrentLanguage();
+    
+    // Update clear button tooltip
+    const clearBtn = document.querySelector('.clear-chat-btn');
+    if (clearBtn) {
+        clearBtn.title = lang === 'en' ? 'Clear chat history' : 'Xóa lịch sử chat';
+    }
+    
+    // Update status text
+    const statusElement = document.querySelector('.calmi-info .status');
+    if (statusElement) {
+        statusElement.textContent = lang === 'en' 
+            ? 'Ready to listen to you'
+            : 'Sẵn sàng lắng nghe bạn';
+    }
+    
+    // Update input placeholder
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.placeholder = lang === 'en' 
+            ? 'Type your message...'
+            : 'Nhập tin nhắn...';
+    }
+    
+    // If chat is empty (only welcome message), update it
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages.children.length === 1) {
         showWelcomeMessage();
     }
-}
+});
+
+// Optional: Add keyboard shortcut for clear chat (Ctrl+Shift+Delete)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'Delete') {
+        // Only work if calmi chat is active
+        const calmiSection = document.getElementById('calmiChat');
+        if (calmiSection && calmiSection.style.display !== 'none') {
+            clearChat();
+        }
+    }
+});
+
+// Export clear chat function
+window.clearChat = clearChat;
